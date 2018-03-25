@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.saksham.popular_movies">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".Settings"
+            android:label="Movie Settings">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.saksham.popular_movies.MainActivity" />
+        </activity>
+        <activity
+            android:name=".DetailActivity"
+            android:label="Details">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.saksham.popular_movies.MainActivity" />
+        </activity>
+
+        <provider
+            android:name=".Data.MovieProvider"
+            android:authorities="com.example.saksham.popular_movies"
+            android:exported="false" />
+
+        <activity
+            android:name=".Fav"
+            android:label="Favourite Movies">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.saksham.popular_movies.MainActivity" />
+        </activity>
+        <activity
+            android:name=".MovieReview"
+            android:label="Reviews">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.saksham.popular_movies.DetailActivity" />
+        </activity>
+    </application>
+
+</manifest>

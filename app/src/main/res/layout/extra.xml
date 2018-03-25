@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/trailer"
+        android:layout_marginStart="12dp"
+        android:textSize="20sp"
+        android:id="@+id/trailer"
+        android:textColor="@android:color/black"
+        android:textStyle="bold"/>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/trailer"
+        android:layout_marginTop="10dp"
+        android:id="@+id/linear"
+        android:orientation="vertical">
+
+        <ListView
+            android:id="@+id/videolist"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/reviewbutton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#212121"
+        android:layout_below="@id/linear"
+        android:onClick="Review"
+        android:layout_marginTop="10dp"
+        android:text="@string/review"
+        android:textColor="#FFFFFF"
+        android:textSize="15sp" />
+</RelativeLayout>
