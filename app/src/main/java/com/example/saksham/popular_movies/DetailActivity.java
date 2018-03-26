@@ -5,14 +5,20 @@ import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,6 +28,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -36,10 +43,12 @@ import java.util.Date;
 import java.util.List;
 
 
-public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,VideosAdapter.AdapterOnClickHandler {
     private TextView mTitle;
     private ImageView mback;
     private TextView trai;
+
+    private String id1="";
 
     private TextView mplot;
     private TextView mrating;
@@ -63,6 +72,13 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     private String id;
     private static final String API_KEY = BuildConfig.API_KEY;
     private static final int MOVIE_LOADER = 3;
+
+
+    private ProgressBar mLoadingIndicator;
+    private TextView mErrorMessageDisplay;
+   private RecyclerView recyclerView;
+
+
     private VideosAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,47 +95,30 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         mback = (ImageView) findViewById(R.id.backimage);
         ImageView imageView11=(ImageView)findViewById(R.id.image1);
         Intent intentThatStartedThisActivity = getIntent();
+
+        mErrorMessageDisplay = (TextView) findViewById(R.id.videoerror);
+        mLoadingIndicator = (ProgressBar) findViewById(R.id.videoprocess);
+
         if (intentThatStartedThisActivity.hasExtra("movieid")) {
             movieid= intentThatStartedThisActivity.getStringExtra("movieid");
-
         }
+
         modified = "https://api.themoviedb.org/3/movie/" + movieid + "/videos" + "?api_key=" + API_KEY;
 
-        LoaderManager loaderManager1 = getLoaderManager();
-        loaderManager1.initLoader(MOVIE_LOADER, null, videodata);
-
-        adapter=new VideosAdapter(this,new ArrayList<Videos>());
-
-        ListView list=(ListView)findViewById(R.id.videolist);
-
-        list.setAdapter(adapter);
 
 
 
-        list.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                // I took this method from stackoverflow because trailer listview was not scrollable.
-                v.getParent().requestDisallowInterceptTouchEvent(true);
-                return false;
-            }
-        });
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Videos currentvideo=adapter.getItem(position);
-                 id=currentvideo.getKey();
-                 vurl="http://www.youtube.com/watch?v=" + id;
-                Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + id));
-                Intent webIntent = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse("http://www.youtube.com/watch?v=" + id));
-                try {
-                    startActivity(appIntent);
-                } catch (ActivityNotFoundException ex) {
-                    startActivity(webIntent);
-                }
-            }
-        });
+        recyclerView=(RecyclerView)findViewById(R.id.videolist) ;
+
+        LinearLayoutManager layoutManager
+                = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        recyclerView.setLayoutManager(layoutManager);
+        adapter=new VideosAdapter(this,this);
+
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(adapter);
+
+        loader();
 
         Intent favintent = getIntent();
         current = favintent.getData();
@@ -141,7 +140,48 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             imageView11.setVisibility(View.GONE);
 
         }
+
     }
+
+    private void loader()
+    {
+        showWeatherDataView();
+
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+        if (networkInfo != null && networkInfo.isConnected()) {
+            LoaderManager loaderManager1 = getLoaderManager();
+            loaderManager1.initLoader(MOVIE_LOADER, null, videodata);
+
+        }
+        else
+        {
+            showErrorMessage();
+            mLoadingIndicator.setVisibility(View.VISIBLE);
+        }
+    }
+
+
+    private void showWeatherDataView() {
+
+        mErrorMessageDisplay.setVisibility(View.INVISIBLE);
+
+        recyclerView.setVisibility(View.VISIBLE);
+    }
+
+
+    private void showErrorMessage() {
+
+        recyclerView.setVisibility(View.INVISIBLE);
+
+        mErrorMessageDisplay.setVisibility(View.VISIBLE);
+    }
+
+
+
     public void detaildata()
     {
         Intent intentThatStartedThisActivity = getIntent();
@@ -156,7 +196,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                 if (poster.isEmpty()) {
                     mback.setImageResource(R.drawable.noimage);
                 } else{
-                    Picasso.with(this).load(modifiedback).into(mback);
+                    Picasso.get().load(modifiedback).into(mback);
                 }
             }
 
@@ -317,7 +357,7 @@ public void Review(View view)
             mrating.setText(temp);
             mplot.setText(description);
             String modified="http://image.tmdb.org/t/p/w500"+photo;
-            Picasso.with(this).load(modified).into(mback);
+            Picasso.get().load(modified).into(mback);
 
             toggle.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -366,14 +406,17 @@ public void Review(View view)
 
         @Override
         public void onLoadFinished(Loader<List<Videos>> loader, List<Videos> videos) {
+            mLoadingIndicator.setVisibility(View.INVISIBLE);
             if (videos != null && videos.size() > 0) {
-                adapter.addAll(videos);
+                showWeatherDataView();
+                adapter.setBakingData(videos);
+            }
+            else {
+                showErrorMessage();
             }
         }
-
         @Override
         public void onLoaderReset(Loader<List<Videos>> loader) {
-            adapter.clear();
         }
     };
 
@@ -402,12 +445,16 @@ public void Review(View view)
         if (id == R.id.action_share) {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            Videos currentvideo=adapter.getItem(0);
-            String id1=currentvideo.getKey();
-            vurl="http://www.youtube.com/watch?v=" + id1;
-            sendIntent.putExtra(Intent.EXTRA_TEXT, vurl);
-            sendIntent.setType("text/plain");
-            startActivity(sendIntent);
+             if(TextUtils.isEmpty(id1))
+             {
+                 Toast.makeText(this,"First Click on Video You Want To Share",Toast.LENGTH_SHORT).show();
+             }
+             else {
+                 vurl = "http://www.youtube.com/watch?v=" + id1;
+                 sendIntent.putExtra(Intent.EXTRA_TEXT, vurl);
+                 sendIntent.setType("text/plain");
+                 startActivity(sendIntent);
+             }
             return true;
         }
 
@@ -416,6 +463,21 @@ public void Review(View view)
            return true;
        }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(String videourl) {
+        id=videourl;
+        id1=videourl;
+        vurl="http://www.youtube.com/watch?v=" + id;
+        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + id));
+        Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("http://www.youtube.com/watch?v=" + id));
+        try {
+            startActivity(appIntent);
+        } catch (ActivityNotFoundException ex) {
+            startActivity(webIntent);
+        }
     }
 }
 

@@ -1,41 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/trailer"
         android:layout_marginStart="12dp"
-        android:textSize="20sp"
+        android:textSize="25sp"
+        android:layout_marginBottom="10dp"
         android:id="@+id/trailer"
         android:textColor="@android:color/black"
         android:textStyle="bold"/>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/trailer"
-        android:layout_marginTop="10dp"
-        android:id="@+id/linear"
-        android:orientation="vertical">
 
-        <ListView
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#f1f5f8">
+
+        <android.support.v7.widget.RecyclerView
             android:id="@+id/videolist"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:scrollbars="vertical" />
+        <TextView
+            android:id="@+id/videoerror"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:layout_centerInParent="true"
+            android:text="@string/error_message"
+            android:textSize="20sp"
+            android:visibility="invisible" />
 
-    </LinearLayout>
+        <ProgressBar
+            android:id="@+id/videoprocess"
+            android:layout_height="42dp"
+            android:layout_width="42dp"
+            android:layout_centerInParent="true"
+            android:visibility="visible" />
+    </RelativeLayout>
 
     <Button
         android:id="@+id/reviewbutton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#212121"
-        android:layout_below="@id/linear"
         android:onClick="Review"
         android:layout_marginTop="10dp"
+        android:layout_gravity="bottom"
         android:text="@string/review"
         android:textColor="#FFFFFF"
         android:textSize="15sp" />
-</RelativeLayout>
+</LinearLayout>

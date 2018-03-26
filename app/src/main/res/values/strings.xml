@@ -33,6 +33,6 @@
     <string name="plot">This movie is a ver good movie and has got mant awardds and is n</string>
     <string name="poster" >Movie Poster</string>
     <string name="noreview" >No Review Available </string>
-    <string name="trailer">Trailers:</string>
+    <string name="trailer">Videos:</string>
     <string name="review">Movie Reviews</string>
 </resources>

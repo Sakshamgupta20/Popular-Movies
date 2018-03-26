@@ -209,11 +209,10 @@ public class NetworkUtils {
                    String  name=currentMovie.getString("name");
                    String trailer = currentMovie.getString("key");
 
-                if(type.equalsIgnoreCase("Trailer"))
-                {
+
                     Videos video1 = new Videos(trailer, name);
                     moviesvideo.add(video1);
-                }
+
             }
         } catch (JSONException e) {
 

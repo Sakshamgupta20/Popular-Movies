@@ -37,7 +37,7 @@ public class FavMovieAdapter extends CursorAdapter {
         if (poster.isEmpty()) {
             imageView.setImageResource(R.drawable.noimage);
         } else{
-            Picasso.with(context).load(a).into(imageView);
+            Picasso.get().load(a).into(imageView);
         }
 
     }

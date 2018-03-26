@@ -43,7 +43,7 @@ public class MoviesAdapter extends ArrayAdapter<Movies> {
          if (poster.isEmpty()) {
            poster1.setImageResource(R.drawable.noimage);
          } else{
-        Picasso.with(context).load(a).into(poster1);
+        Picasso.get().load(a).into(poster1);
          }
 
         return listItemView;
