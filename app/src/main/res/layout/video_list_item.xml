@@ -10,8 +10,11 @@ android:layout_height="wrap_content">
     android:layout_height="match_parent"
     android:layout_gravity="center"
     android:layout_margin="@dimen/card_margin"
-    android:elevation="4dp"
-    card_view:cardCornerRadius="@dimen/card_album_radius">
+    android:elevation="5dp"
+    card_view:cardBackgroundColor="#FFFFFF"
+    android:foreground="?android:attr/selectableItemBackground"
+    card_view:cardUseCompatPadding="true"
+    card_view:cardCornerRadius="10dp">
 
     <RelativeLayout
         android:layout_width="match_parent"

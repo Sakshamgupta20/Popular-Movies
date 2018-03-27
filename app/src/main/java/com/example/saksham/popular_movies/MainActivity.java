@@ -11,6 +11,8 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,7 +26,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Movies>>,SharedPreferences.OnSharedPreferenceChangeListener{
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Movies>>,SharedPreferences.OnSharedPreferenceChangeListener,MoviesAdapter.AdapterOnClickHandler{
 
 
     private MoviesAdapter mAdapter;
@@ -34,10 +36,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final int MOVIE_LOADER_ID=1;
     private static boolean PREFERENCES_HAVE_BEEN_UPDATED = false;
     private ProgressBar mLoadingIndicator;
+    private RecyclerView recyclerView;
 
 
-    private String movieid;
-   private GridView list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,36 +47,27 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
-         list=(GridView) findViewById(R.id.list) ;
+
+         recyclerView=(RecyclerView)findViewById(R.id.list) ;
+
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(),2);
+        recyclerView.setLayoutManager(gridLayoutManager);
 
 
 
-        mAdapter=new MoviesAdapter(this,new ArrayList<Movies>());
-        list.setAdapter(mAdapter);
+        recyclerView.setHasFixedSize(true);
+
+
+        mAdapter=new MoviesAdapter(this,this);
+
+        recyclerView.setAdapter(mAdapter);
 
 
 
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Movies currentmovie=mAdapter.getItem(position);
-
-                Intent detailintent=new Intent(MainActivity.this,DetailActivity.class);
-                movieid=currentmovie.getMovieid();
-                detailintent.putExtra("titlekey", currentmovie.getTitle());
-                detailintent.putExtra("backposter",currentmovie.getDetailposter());
-                detailintent.putExtra("plotkey",currentmovie.getPlot());
-                detailintent.putExtra("ratingkey",currentmovie.getRaiting());
-                detailintent.putExtra("datekey",currentmovie.getReleasedate());
-                detailintent.putExtra("movieid",movieid);
-                detailintent.putExtra("poster",currentmovie.getImageUrl());
-                startActivity(detailintent);
-            }
-        });
         PreferenceManager.getDefaultSharedPreferences(this)
                 .registerOnSharedPreferenceChangeListener(this);
 
-loader();
+        loader();
     }
     @Override
     protected void onStart() {
@@ -104,9 +96,6 @@ private void loader()
     if (networkInfo != null && networkInfo.isConnected()) {
         LoaderManager loaderManager = getLoaderManager();
 
-        // Initialize the loader. Pass in the int ID constant defined above and pass in null for
-        // the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
-        // because this activity implements the LoaderCallbacks interface).
         loaderManager.initLoader(MOVIE_LOADER_ID, null, this);
 
     }
@@ -142,13 +131,13 @@ private void loader()
 
         mErrorMessageDisplay.setVisibility(View.INVISIBLE);
 
-        list.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.VISIBLE);
     }
 
 
     private void showErrorMessage() {
 
-        list.setVisibility(View.INVISIBLE);
+        recyclerView.setVisibility(View.INVISIBLE);
 
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
     }
@@ -172,7 +161,7 @@ private void loader()
         mAdapter.clear();
         if (movies != null && movies.size()>0) {
             showWeatherDataView();
-            mAdapter.addAll(movies);
+            mAdapter.setBakingData(movies);
         }
         else
         {
@@ -224,4 +213,18 @@ private void loader()
         PREFERENCES_HAVE_BEEN_UPDATED=true;
     }
 
+    @Override
+    public void onClick(String titlekey, String backposter, String plotkey, String ratingkey, String datekey, String movieid, String poster) {
+
+        Intent detailintent=new Intent(MainActivity.this,DetailActivity.class);
+        detailintent.putExtra("titlekey", titlekey);
+        detailintent.putExtra("backposter",backposter);
+        detailintent.putExtra("plotkey",plotkey);
+        detailintent.putExtra("ratingkey",ratingkey);
+        detailintent.putExtra("datekey",datekey);
+        detailintent.putExtra("movieid",movieid);
+        detailintent.putExtra("poster",poster);
+        startActivity(detailintent);
+
+    }
 }

@@ -4,12 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-   <GridView
+   <android.support.v7.widget.RecyclerView
        android:layout_width="match_parent"
        android:layout_height="match_parent"
-       android:numColumns="auto_fit"
        android:id="@+id/list">
-   </GridView>
+   </android.support.v7.widget.RecyclerView>
 
    <TextView
    android:id="@+id/tv_error_message_display"

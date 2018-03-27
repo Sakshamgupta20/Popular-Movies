@@ -29,6 +29,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -129,7 +130,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             {
                 toggle.setChecked(true);
             }
-
         }
         else
         {
@@ -138,7 +138,8 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             trai.setVisibility(View.GONE);
             reviewbutto.setVisibility(View.GONE);
             imageView11.setVisibility(View.GONE);
-
+            RelativeLayout layout=(RelativeLayout)findViewById(R.id.videofav);
+            layout.setVisibility(View.GONE);
         }
 
     }

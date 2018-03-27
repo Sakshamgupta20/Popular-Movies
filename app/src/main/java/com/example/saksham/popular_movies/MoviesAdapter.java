@@ -1,11 +1,14 @@
 package com.example.saksham.popular_movies;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
@@ -15,37 +18,88 @@ import java.util.List;
  * Created by Saksham on 26-01-2018.
  */
 
-public class MoviesAdapter extends ArrayAdapter<Movies> {
-    private Context context;
-    public MoviesAdapter(Context context, List<Movies>movie) {
-        super(context, 0, movie);
-        this.context=context;
+public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHolder>  {
+
+    private Context mContext;
+    private List<Movies> movieList;
+
+
+    private final AdapterOnClickHandler mOnClickListener;
+
+    public interface AdapterOnClickHandler {
+        void onClick(String titlekey,String backposter,String plotkey,String ratingkey,String datekey,String movieid,String poster);
     }
 
-    public View getView(int position, View convertView, ViewGroup parent) {
 
-        View listItemView = convertView;
-        if (listItemView == null) {
-            listItemView = LayoutInflater.from(getContext()).inflate(
-                    R.layout.main_list_view, parent, false);
+
+    public MoviesAdapter(Context mContext,AdapterOnClickHandler clickHandler) {
+        this.mContext = mContext;
+        mOnClickListener=clickHandler;
+    }
+
+
+    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+
+        ImageView image;
+        public MyViewHolder(View view) {
+            super(view);
+
+            image=view.findViewById(R.id.poster);
+
+            view.setOnClickListener(this);
         }
 
+        @Override
+        public void onClick(View view) {
+            int adapterPosition = getAdapterPosition();
+            String titlekey=movieList.get(adapterPosition).getTitle();
+            String  backposter=movieList.get(adapterPosition).getDetailposter();
+            String  plotkey=movieList.get(adapterPosition).getPlot();
+            String  ratingkey=movieList.get(adapterPosition).getRaiting();
+            String  datekey=movieList.get(adapterPosition).getReleasedate();
+            String  movieid=movieList.get(adapterPosition).getMovieid();
+            String  poster=movieList.get(adapterPosition).getImageUrl();
 
-        Movies currentmovie = getItem(position);
+            mOnClickListener.onClick(titlekey,backposter,plotkey,ratingkey,datekey,movieid,poster);
+        }
+    }
 
 
-        ImageView poster1=(ImageView)listItemView.findViewById(R.id.poster);
+    @Override
+    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View itemView = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.main_list_view, parent, false);
+        return new MyViewHolder(itemView);
+    }
 
-        String poster=currentmovie.getImageUrl();
-
+    @Override
+    public void onBindViewHolder(MyViewHolder holder, int position) {
+        Movies movies = movieList.get(position);
+        String poster=movies.getImageUrl();
         String a="http://image.tmdb.org/t/p/w780"+poster;
+        if (poster.isEmpty()) {
+            holder.image.setImageResource(R.drawable.noimage);
+        } else{
+            Picasso.get().load(a).into(holder.image);
+        }
+    }
 
-         if (poster.isEmpty()) {
-           poster1.setImageResource(R.drawable.noimage);
-         } else{
-        Picasso.get().load(a).into(poster1);
-         }
+    @Override
+    public int getItemCount() {
+        if (null == movieList) return 0;
+        return movieList.size();
+    }
 
-        return listItemView;
+    public void setBakingData(List<Movies> movieData) {
+        movieList = movieData;
+        notifyDataSetChanged();
+    }
+    public void clear() {
+        movieList=null;
+        notifyDataSetChanged();
     }
 }
+
+
+
+
